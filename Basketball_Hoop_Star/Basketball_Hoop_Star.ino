@@ -1,9 +1,13 @@
 
 //include libraries
+#include <Wire.h> // Enable this line if using Arduino Uno, Mega, etc.
 #include "Adafruit_LEDBackpack.h"
 #include "Adafruit_GFX.h"
 
 
+
+
+Adafruit_7segment matrix = Adafruit_7segment();
 //create Adafruit Alphanumeric Display object
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 
@@ -21,6 +25,11 @@ volatile boolean timeFlag = false;
 
 
 void setup() {
+  #ifndef __AVR_ATtiny85__
+    Serial.begin(9600);
+    Serial.println("7 Segment Backpack Test");
+  #endif
+    matrix.begin(0x70);
   
   //set sensor pin to INPUT
   pinMode(A0, INPUT);
@@ -47,35 +56,7 @@ void loop() {
   // this prevents the time from being constantly shown.
   if (TimeHasChanged() ) 
   {
-     //add 1 to the score if sensor voltage is LOW
-  if (analogRead(A0) > 200) {
-    
-    inRange = true;   
- 
-  //write score to display data
- /* alpha4.writeDigitAscii(3, (score%10) + '0');
-  alpha4.writeDigitAscii(2, (score%100/10) + '0');
-  alpha4.writeDigitAscii(1, (score%1000/100) + '0');
-  alpha4.writeDigitAscii(0, (score/1000) + '0');*/
-  
-  //push display data to display
-  alpha4.writeDisplay();
- //wait 1.5 sec to eliminate phantom reads
-  
-  } else {
-    inRange = false;
-  }
-
-  if(inRange == true){
-    score++;
-    Serial.println("Score");
-    Serial.println(score);
-    
-    delay(500);
-  } else {
-    Serial.println("no basket");
-  }
-    
+   
     Serial.print(ShowMinutes());
     Serial.print(":");
     Serial.print(ShowSeconds());
@@ -103,17 +84,20 @@ void loop() {
   } else {
     inRange = false;
   }
+  
 
   if(inRange == true){
     score++;
     Serial.println("Score");
     Serial.println(score);
-    
+    matrix.print(score);
+    matrix.writeDisplay();   
     delay(500);
   } else {
     Serial.println("no basket");
   }
   
+    
   
 }
 
