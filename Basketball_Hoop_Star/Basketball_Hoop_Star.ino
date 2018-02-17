@@ -6,15 +6,12 @@
 
 
 
-
+//create matrix display object
 Adafruit_7segment matrix = Adafruit_7segment();
-//create Adafruit Alphanumeric Display object
-Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 
-//define integer
+//define variables
 int score = 0;
 int counter = 10;
-bool inRange = false;
 unsigned long Watch, _micro, time = micros();
 unsigned int Clock = 0, R_clock;
 boolean Reset = false, Stop = false, Paused = false, _type;
@@ -35,20 +32,13 @@ void setup() {
   pinMode(A0, INPUT);
   //set BAUD rate
   Serial.begin(9600);  
-  SetTimer(0,0,10); // 1 minute 1 seconds
-  StartTimer();
-  //start display
-  alpha4.begin(0x70);
-  //write zeros to all positions
-  alpha4.writeDigitAscii(0, '0');
-  alpha4.writeDigitAscii(1, '0');
-  alpha4.writeDigitAscii(2, '0');
-  alpha4.writeDigitAscii(3, '0');
-  //display newly written values
-  alpha4.writeDisplay();
+  SetTimer(0,0,60); // 1 minute 1 seconds
+  StartTimer();  
 }
 
 void loop() {
+  
+  //initialize display to show zero
   if(score == 0){
     matrix.print(0);
     matrix.writeDisplay(); 
@@ -59,47 +49,27 @@ void loop() {
   // this prevents the time from being constantly shown.
   if (TimeHasChanged() ) 
   {
-   
-    //Serial.print(ShowMinutes());
-    //Serial.print(":");
-    //Serial.print(ShowSeconds());
-    //Serial.println();
-    // This DOES NOT format the time to 0:0x when seconds is less than 10.
-    // if you need to format the time to standard format, use the sprintf() function.
+    //print timer to 7 segment display
+    /*matrix.print(ShowSeconds());
+    if(ShowSeconds()<10){
+      matrix.writeDigitNum(3,0);
+    }
+    if(ShowMinutes()>0){
+      matrix.writeDigitNum(1,ShowMinutes());
+    }        
+    matrix.drawColon(true);
+    matrix.writeDisplay();
+    delay(1000);*/
   }
  
-  Serial.println(analogRead(A0));
+  //Serial.println(analogRead(A0));
   //add 1 to the score if sensor voltage is LOW
-  if (analogRead(A0) > 300) {
-    
-    inRange = true;   
- 
-  //write score to display data
- /* alpha4.writeDigitAscii(3, (score%10) + '0');
-  alpha4.writeDigitAscii(2, (score%100/10) + '0');
-  alpha4.writeDigitAscii(1, (score%1000/100) + '0');
-  alpha4.writeDigitAscii(0, (score/1000) + '0');*/
-  
-  //push display data to display
-  alpha4.writeDisplay();
- //wait 1.5 sec to eliminate phantom reads
-  
-  } else {
-    inRange = false;
-  }
-  
-
-  if(inRange == true){
+  if (analogRead(A0) > 300) {    
     score++;
     matrix.print(score);
     matrix.writeDisplay();   
-    delay(500);
-    //Serial.println("Score");
-    //Serial.println(score);    
-  } else {
-    //Serial.println("no basket");
-  }    
-  
+    delay(1500);  
+  }
 }
 
 boolean CountUpDownTimer(boolean Type)
