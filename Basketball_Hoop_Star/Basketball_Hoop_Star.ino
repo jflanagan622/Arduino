@@ -49,7 +49,10 @@ void setup() {
 }
 
 void loop() {
-  
+  if(score == 0){
+    matrix.print(0);
+    matrix.writeDisplay(); 
+  }
  
   CountUpDownTimer(DOWN); // run the timer
 
@@ -57,17 +60,17 @@ void loop() {
   if (TimeHasChanged() ) 
   {
    
-    Serial.print(ShowMinutes());
-    Serial.print(":");
-    Serial.print(ShowSeconds());
-    Serial.println();
+    //Serial.print(ShowMinutes());
+    //Serial.print(":");
+    //Serial.print(ShowSeconds());
+    //Serial.println();
     // This DOES NOT format the time to 0:0x when seconds is less than 10.
     // if you need to format the time to standard format, use the sprintf() function.
   }
  
-  
+  Serial.println(analogRead(A0));
   //add 1 to the score if sensor voltage is LOW
-  if (analogRead(A0) > 200) {
+  if (analogRead(A0) > 300) {
     
     inRange = true;   
  
@@ -88,16 +91,14 @@ void loop() {
 
   if(inRange == true){
     score++;
-    Serial.println("Score");
-    Serial.println(score);
     matrix.print(score);
     matrix.writeDisplay();   
     delay(500);
+    //Serial.println("Score");
+    //Serial.println(score);    
   } else {
-    Serial.println("no basket");
-  }
-  
-    
+    //Serial.println("no basket");
+  }    
   
 }
 
