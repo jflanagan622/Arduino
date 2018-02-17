@@ -1,3 +1,9 @@
+#include <Wire.h> // Enable this line if using Arduino Uno, Mega, etc.
+#include "Adafruit_LEDBackpack.h"
+#include "Adafruit_GFX.h"
+
+Adafruit_7segment matrix = Adafruit_7segment();
+
 unsigned long Watch, _micro, time = micros();
 unsigned int Clock = 0, R_clock;
 boolean Reset = false, Stop = false, Paused = false, _type;
@@ -8,8 +14,12 @@ volatile boolean timeFlag = false;
 
 void setup()
 {
-  Serial.begin(9600);
-  SetTimer(0,1,1); // 10 seconds
+  #ifndef __AVR_ATtiny85__
+    Serial.begin(9600);
+    Serial.println("7 Segment Backpack Test");
+  #endif
+    matrix.begin(0x70);
+  SetTimer(0,2,10); // 10 seconds
   StartTimer();
 }
 
@@ -20,11 +30,20 @@ void loop()
   // this prevents the time from being constantly shown.
   if (TimeHasChanged() ) 
   {
-    
-    Serial.print(ShowMinutes());
-    Serial.print(":");
-    Serial.print(ShowSeconds());
-    Serial.println();
+    matrix.print(ShowSeconds());
+    if(ShowSeconds()<10){
+      matrix.writeDigitNum(3,0);
+    }
+    if(ShowMinutes()>0){
+      matrix.writeDigitNum(1,ShowMinutes());
+    }        
+    matrix.drawColon(true);
+    matrix.writeDisplay();
+    delay(1000);
+    //Serial.print(ShowMinutes());
+    //Serial.print(":");
+    //Serial.print(ShowSeconds());
+    //Serial.println();
     // This DOES NOT format the time to 0:0x when seconds is less than 10.
     // if you need to format the time to standard format, use the sprintf() function.
   }
